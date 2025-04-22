@@ -22,12 +22,12 @@ const authApiRequest = {
       },
       {
         headers: {
-          Authorization: `Bearer ${body.refreshToken}`,
+          Authorization: `Bearer ${body.accessToken}`,
         },
       }
     ),
   // Logout from next client call to next server dont need to send accesstoken and refresh token because it will auto send by cookies
-  logout: () => http.post("api/auth/logout", { baseUrl: "" }),
+  logout: () => http.post("api/auth/logout", null, { baseUrl: "" }),
 };
 
 export default authApiRequest;

@@ -10,18 +10,19 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useLoginMutation } from '@/queries/useAuth'
 import { toast } from "sonner"
 import { handleErrorApi } from '@/lib/utils'
+import { useRouter } from 'next/navigation'
 
 
 export default function LoginForm() {
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
-      email: '',
+      email: 'admin@order.com',
       password: ''
     }
   })
   const loginMutation = useLoginMutation()
-
+  const router = useRouter();
   const onSubmit = async (body: LoginBodyType) => {
     if (loginMutation.isPending) return
     else {
@@ -29,6 +30,8 @@ export default function LoginForm() {
         const result = await loginMutation.mutateAsync(body)
         if (result) {
           toast(result.payload.message)
+          router.push('/manage/dashboard')
+          router.refresh()
         }
       } catch (error) {
         handleErrorApi({ error, setError: form.setError })
