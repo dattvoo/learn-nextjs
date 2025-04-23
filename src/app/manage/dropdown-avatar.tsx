@@ -11,18 +11,27 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { useLogoutMutation } from '@/queries/useAuth'
-import { toast } from 'sonner'
 import { handleErrorApi } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
+import { useGetProfile } from '@/queries/useAccount'
+import { useEffect, useState } from 'react'
+import { AccountType } from '@/schemaValidations/account.schema'
 
-const account = {
-    name: 'Nguyễn Văn A',
-    avatar: 'https://i.pravatar.cc/150'
-}
 
 export default function DropdownAvatar() {
     const mutation = useLogoutMutation();
     const router = useRouter()
+    const [profile, setProfile] = useState<AccountType>();
+
+    const { data } = useGetProfile()
+
+    useEffect(() => {
+        if (data) {
+            setProfile(data.payload.data)
+        }
+    }, [data])
+
+
     const handleLogout = async () => {
         if (mutation.isPending) return
         try {
@@ -40,13 +49,13 @@ export default function DropdownAvatar() {
             <DropdownMenuTrigger asChild>
                 <Button variant='outline' size='icon' className='overflow-hidden rounded-full'>
                     <Avatar>
-                        <AvatarImage src={account.avatar ?? undefined} alt={account.name} />
-                        <AvatarFallback>{account.name.slice(0, 2).toUpperCase()}</AvatarFallback>
+                        <AvatarImage src={profile?.avatar ?? undefined} alt={profile?.name as string} />
+                        <AvatarFallback>{profile ? (profile?.name as string).slice(0, 2).toUpperCase() : ""}</AvatarFallback>
                     </Avatar>
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end'>
-                <DropdownMenuLabel>{account.name}</DropdownMenuLabel>
+                <DropdownMenuLabel>{profile?.name as string ?? ""}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                     <Link href={'/manage/setting'} className='cursor-pointer'>
