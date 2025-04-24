@@ -39,6 +39,7 @@ export default function DropdownAvatar() {
             await mutation.mutateAsync();
             router.push('/');
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             handleErrorApi(error)
         }
@@ -49,7 +50,7 @@ export default function DropdownAvatar() {
             <DropdownMenuTrigger asChild>
                 <Button variant='outline' size='icon' className='overflow-hidden rounded-full'>
                     <Avatar>
-                        <AvatarImage src={profile?.avatar ?? undefined} alt={profile?.name as string} />
+                        <AvatarImage src={profile?.avatar || undefined} alt={profile?.name as string} />
                         <AvatarFallback>{profile ? (profile?.name as string).slice(0, 2).toUpperCase() : ""}</AvatarFallback>
                     </Avatar>
                 </Button>
