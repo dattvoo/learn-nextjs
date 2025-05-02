@@ -14,15 +14,17 @@ import { useGetProfile, useUpdateMeMutation } from '@/queries/useAccount'
 import { useMediaMutation } from '@/queries/useMedia'
 import { handleErrorApi } from '@/lib/utils'
 import { toast } from 'sonner'
+import Spinner from '@/components/ui/spiner'
 
 export default function UpdateProfileForm() {
     const inputRef = useRef<HTMLInputElement>(null);
     const [imgFile, setImgFile] = useState<File | null>(null)
+    const [isLoading, setLoading] = useState(false)
+
 
     const { data, refetch } = useGetProfile();
     const updateMeMutation = useUpdateMeMutation()
     const useMediaUploadMutation = useMediaMutation()
-
 
     const form = useForm<UpdateMeBodyType>({
         resolver: zodResolver(UpdateMeBody),
@@ -31,10 +33,8 @@ export default function UpdateProfileForm() {
             avatar: ''
         }
     })
-
     // console.log('Errors when submit form:', errors);
     // console.log('avatar', form.getValues('avatar'));
-
     useEffect(() => {
         if (data) {
             form.reset(
@@ -62,12 +62,12 @@ export default function UpdateProfileForm() {
     }
 
     const onSubmit = async (values: UpdateMeBodyType) => {
+        setLoading(true)
         if (updateMeMutation.isPending) return
         try {
             let body = values
             // O day se chia 2 truong hop upLoad anh, Neu nhu co chon file anh thi se upload anh truoc => tra ve URL roi ta moi lay URL de gan vao`
             if (imgFile) {
-                console.log('in hrer')
                 const formData = new FormData();
                 formData.append('file', imgFile)
                 const uploadImageResult = await useMediaUploadMutation.mutateAsync(formData)
@@ -81,12 +81,12 @@ export default function UpdateProfileForm() {
             const result = await updateMeMutation.mutateAsync(body)
             toast(result.payload.message)
             refetch()
+            setLoading(false)
         } catch (error: any) {
+            setLoading(false)
             handleErrorApi(error)
-            console.log('error in hể?', error)
         }
     }
-
 
     return (
         <Form {...form}>
@@ -164,6 +164,7 @@ export default function UpdateProfileForm() {
                     </CardContent>
                 </Card>
             </form>
+            {isLoading && <Spinner />}
         </Form>
     )
 }
