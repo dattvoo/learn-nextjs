@@ -164,7 +164,7 @@ export default function UpdateProfileForm() {
                     </CardContent>
                 </Card>
             </form>
-            {isLoading && <Spinner />}
+            {isLoading && <Spinner isLoading />}
         </Form>
     )
 }
