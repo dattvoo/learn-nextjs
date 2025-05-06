@@ -8,13 +8,12 @@ import { useForm } from 'react-hook-form'
 import { ChangePasswordBody, ChangePasswordBodyType } from '@/schemaValidations/account.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
-import { useChangePasswordMutation } from '@/queries/useAccount'
+import { useChangePasswordMutation, useChangePasswordMutationV2 } from '@/queries/useAccount'
 import { toast } from 'sonner'
 import { handleErrorApi } from '@/lib/utils'
-import accountAPIRequest from '@/apiRequests/account'
 
 export default function ChangePasswordForm() {
-    const changePasswordMutation = useChangePasswordMutation()
+    const changePasswordMutation = useChangePasswordMutationV2()
     const form = useForm<ChangePasswordBodyType>({
         resolver: zodResolver(ChangePasswordBody),
         defaultValues: {
@@ -27,6 +26,7 @@ export default function ChangePasswordForm() {
         if (changePasswordMutation.isPending) return
         try {
             const result = await changePasswordMutation.mutateAsync(values)
+            console.log('New accessToken', result.payload.data.accessToken)
             toast(result.payload.message)
             form.reset()
         } catch (error: unknown) {
@@ -36,12 +36,7 @@ export default function ChangePasswordForm() {
             })
         }
     }
-    const getData = async () => {
-        const data = await accountAPIRequest.getData()
-        console.log("data", data)
-        return data
-    }
-    getData()
+
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} noValidate className='grid auto-rows-max items-start gap-4 md:gap-8'>
@@ -82,7 +77,6 @@ export default function ChangePasswordForm() {
                                 control={form.control}
                                 name='confirmPassword'
                                 render={({ field }) => {
-                                    console.log('field', field);
                                     return (
                                         <FormItem>
                                             <div className='grid gap-3'>
