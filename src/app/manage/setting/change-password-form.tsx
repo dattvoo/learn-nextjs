@@ -7,13 +7,14 @@ import { Label } from '@/components/ui/label'
 import { useForm } from 'react-hook-form'
 import { ChangePasswordBody, ChangePasswordBodyType } from '@/schemaValidations/account.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
-// import { useChangePasswordMutation } from '@/queries/useAccount'
-// import { toast } from '@/components/ui/use-toast'
-// import { handleErrorApi } from '@/lib/utils'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import { useChangePasswordMutation } from '@/queries/useAccount'
+import { toast } from 'sonner'
+import { handleErrorApi } from '@/lib/utils'
+import accountAPIRequest from '@/apiRequests/account'
 
 export default function ChangePasswordForm() {
-    // const changePasswordMutation = useChangePasswordMutation()
+    const changePasswordMutation = useChangePasswordMutation()
     const form = useForm<ChangePasswordBodyType>({
         resolver: zodResolver(ChangePasswordBody),
         defaultValues: {
@@ -22,24 +23,28 @@ export default function ChangePasswordForm() {
             confirmPassword: ''
         }
     })
-    // async function onSubmit(values: ChangePasswordBodyType) {
-    //     if (changePasswordMutation.isPending) return
-    //     try {
-    //         const result = await changePasswordMutation.mutateAsync(values)
-    //         toast({
-    //             description: result.payload.message
-    //         })
-    //         form.reset()
-    //     } catch (error: any) {
-    //         handleErrorApi({
-    //             error,
-    //             setError: form.setError
-    //         })
-    //     }
-    // }
+    async function onSubmit(values: ChangePasswordBodyType) {
+        if (changePasswordMutation.isPending) return
+        try {
+            const result = await changePasswordMutation.mutateAsync(values)
+            toast(result.payload.message)
+            form.reset()
+        } catch (error: unknown) {
+            handleErrorApi({
+                error,
+                setError: form.setError
+            })
+        }
+    }
+    const getData = async () => {
+        const data = await accountAPIRequest.getData()
+        console.log("data", data)
+        return data
+    }
+    getData()
     return (
         <Form {...form}>
-            <form onSubmit={() => console.log('')} noValidate className='grid auto-rows-max items-start gap-4 md:gap-8'>
+            <form onSubmit={form.handleSubmit(onSubmit)} noValidate className='grid auto-rows-max items-start gap-4 md:gap-8'>
                 <Card className='overflow-hidden' x-chunk='dashboard-07-chunk-4'>
                     <CardHeader>
                         <CardTitle>Đổi mật khẩu</CardTitle>
@@ -76,21 +81,24 @@ export default function ChangePasswordForm() {
                             <FormField
                                 control={form.control}
                                 name='confirmPassword'
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <div className='grid gap-3'>
-                                            <Label htmlFor='confirmPassword'>Nhập lại mật khẩu mới</Label>
-                                            <Input id='confirmPassword' type='password' className='w-full' {...field} />
-                                            <FormMessage />
-                                        </div>
-                                    </FormItem>
-                                )}
+                                render={({ field }) => {
+                                    console.log('field', field);
+                                    return (
+                                        <FormItem>
+                                            <div className='grid gap-3'>
+                                                <Label htmlFor='confirmPassword'>Nhập lại mật khẩu mới</Label>
+                                                <Input id='confirmPassword' type='password' className='w-full' {...field} />
+                                                <FormMessage />
+                                            </div>
+                                        </FormItem>
+                                    )
+                                }}
                             />
                             <div className=' items-center gap-2 md:ml-auto flex'>
-                                <Button variant='outline' size='sm'>
+                                <Button variant='outline' size='sm' type='reset'>
                                     Hủy
                                 </Button>
-                                <Button size='sm'>Lưu thông tin</Button>
+                                <Button size='sm' type='submit'>Lưu thông tin</Button>
                             </div>
                         </div>
                     </CardContent>
