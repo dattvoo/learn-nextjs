@@ -9,9 +9,24 @@ export const useGetProfile = () => {
     })
 }
 
+export const useGetData = () => {
+    return useQuery({
+        queryKey: ['get-data'],
+        queryFn: accountAPIRequest.getData
+    })
+}
+
 export const useUpdateMeMutation = () => {
 
     return useMutation({
         mutationFn: accountAPIRequest.updateMe
+    })
+}
+
+export const useChangePasswordMutation = () => {
+
+
+    return useMutation({
+        mutationFn: accountAPIRequest.changePassword
     })
 }
