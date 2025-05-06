@@ -15,18 +15,18 @@ export const normalizePath = (path: string) => {
   return path.startsWith("/") ? path.slice(1) : path;
 };
 
-// const isBrowser = typeof window !== "undefined";
+const isBrowser = typeof window !== "undefined";
 
 // export const getAccessTokenFromLocalStorage = () =>
 //   isBrowser ? localStorage.getItem("accessToken") : null;
 
 // export const getRefreshTokenFromLocalStorage = () =>
 //   isBrowser ? localStorage.getItem("refreshToken") : null;
-// export const setAccessTokenToLocalStorage = (value: string) =>
-//   isBrowser && localStorage.setItem("accessToken", value);
+export const setAccessTokenToLocalStorage = (value: string) =>
+  isBrowser && localStorage.setItem("accessToken", value);
 
-// export const setRefreshTokenToLocalStorage = (value: string) =>
-//   isBrowser && localStorage.setItem("refreshToken", value);
+export const setRefreshTokenToLocalStorage = (value: string) =>
+  isBrowser && localStorage.setItem("refreshToken", value);
 
 // export const removeTokensFromLocalStorage = () => {
 //   isBrowser && localStorage.removeItem("accessToken");
@@ -38,7 +38,9 @@ export const handleErrorApi = ({
   setError,
   duration,
 }: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   error: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setError?: UseFormSetError<any>;
   duration?: number;
 }) => {
@@ -50,12 +52,6 @@ export const handleErrorApi = ({
       });
     });
   } else {
-    // toast({
-    //   title: "Lỗi",
-    //   description: error?.payload?.message ?? "Lỗi không xác định",
-    //   variant: "destructive",
-    //   duration: duration ?? 5000,
-    // });
     toast.error("ERROR", {
       description: "Loi k xac dinh",
       duration: duration ?? 5000,
@@ -72,6 +68,7 @@ export const getRefreshTokenFromLocalStorage = () => {
   if (typeof window === "undefined") return null;
   return localStorage.getItem("refreshToken");
 };
+
 export const formatCurrency = (number: number) => {
   return new Intl.NumberFormat("vi-VN", {
     style: "currency",
