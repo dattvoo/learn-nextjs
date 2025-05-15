@@ -1,9 +1,12 @@
 import http from "@/lib/http";
 import {
+  AccountListResType,
   AccountResType,
   ChangePasswordBodyType,
   ChangePasswordV2BodyType,
   ChangePasswordV2ResType,
+  CreateEmployeeAccountBodyType,
+  UpdateEmployeeAccountBodyType,
   UpdateMeBodyType,
 } from "@/schemaValidations/account.schema";
 
@@ -34,6 +37,22 @@ const accountAPIRequest = {
         baseUrl: "",
       }
     ),
+
+  getEmployeeList: () => {
+    return http.get<AccountListResType>(`${prefix}`);
+  },
+  addNewEmployee: (body: CreateEmployeeAccountBodyType) => {
+    return http.post<AccountResType>(prefix, body);
+  },
+  updateEmployee: (id: number, body: UpdateEmployeeAccountBodyType) => {
+    return http.put<AccountResType>(`${prefix}/detail/${id}`, body);
+  },
+  getEmployee: (id: number) => {
+    return http.get<AccountResType>(`${prefix}/detail/${id}`);
+  },
+  deleteEmployee: (id: number) => {
+    return http.delete<AccountResType>(`${prefix}/detail/${id}`);
+  },
 };
 
 export default accountAPIRequest;

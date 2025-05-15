@@ -23,6 +23,7 @@ import { useSearchParams } from 'next/navigation'
 import AutoPagination from '@/components/auto-pagination'
 import AlertDialogDeleteAccount from '@/components/ui/alert-dialog-delete-account'
 import { AccountTableContext, columns } from './columns'
+import { useGetEmployeeList } from '@/queries/useAccount'
 
 export type AccountItem = AccountListResType['data'][0]
 
@@ -77,6 +78,13 @@ export default function AccountTable() {
             pageSize: PAGE_SIZE
         })
     }, [table, pageIndex])
+
+    const employeeList = useGetEmployeeList();
+
+    useEffect(() => {
+        console.log('employee list', employeeList.data?.payload.data);
+
+    }, [employeeList])
 
     return (
         <AccountTableContext.Provider value={{ employeeIdEdit, setEmployeeIdEdit, employeeDelete, setEmployeeDelete }}>
