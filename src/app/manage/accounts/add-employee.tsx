@@ -18,10 +18,19 @@ import { useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useAddAccountMutation } from '@/queries/useAccount'
+import { useMediaMutation } from '@/queries/useMedia'
+import { handleErrorApi } from '@/lib/utils'
+import { toast } from 'sonner'
 
 export default function AddEmployee() {
     const [file, setFile] = useState<File | null>(null)
     const [open, setOpen] = useState(false)
+
+    const addAccountMutation = useAddAccountMutation()
+    const useMediaUploadMutation = useMediaMutation()
+
+
     const avatarInputRef = useRef<HTMLInputElement | null>(null)
     const form = useForm<CreateEmployeeAccountBodyType>({
         resolver: zodResolver(CreateEmployeeAccountBody),
@@ -42,8 +51,37 @@ export default function AddEmployee() {
         return avatar
     }, [file, avatar])
 
+    const onReset = () => {
+        form.reset();
+        setFile(null)
+    }
 
-    // const addAccountMutation =  
+    const onSubmit = async (values: CreateEmployeeAccountBodyType) => {
+        // console.log('values', values);
+        // setLoading(true)
+        if (addAccountMutation.isPending) return
+        try {
+            let body = values
+            // O day se chia 2 truong hop upLoad anh, Neu nhu co chon file anh thi se upload anh truoc => tra ve URL roi ta moi lay URL de gan vao`
+            if (file) {
+                const formData = new FormData();
+                formData.append('file', file)
+                const uploadImageResult = await useMediaUploadMutation.mutateAsync(formData)
+                const urlImageResult = uploadImageResult.payload.data
+                body = {
+                    ...values,
+                    avatar: urlImageResult
+                }
+
+            }
+            const result = await addAccountMutation.mutateAsync(body);
+            toast(result.payload.message)
+            setOpen(false)
+            onReset()
+        } catch (error: any) {
+            handleErrorApi(error)
+        }
+    }
 
 
     return (
@@ -51,16 +89,16 @@ export default function AddEmployee() {
             <DialogTrigger asChild>
                 <Button size='sm' className='h-7 gap-1'>
                     <PlusCircle className='h-3.5 w-3.5' />
-                    <span className='sr-only sm:not-sr-only sm:whitespace-nowrap'>Tạo tài khoản - hihi</span>
+                    <span className='sr-only sm:not-sr-only sm:whitespace-nowrap'>Tạo tài khoản</span>
                 </Button>
             </DialogTrigger>
             <DialogContent className='sm:max-w-[600px] max-h-screen overflow-auto'>
                 <DialogHeader>
-                    <DialogTitle>Tạo tài khoản - Hello </DialogTitle>
+                    <DialogTitle>Tạo tài khoản</DialogTitle>
                     <DialogDescription>Các trường tên, email, mật khẩu là bắt buộc</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
-                    <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='add-employee-form'>
+                    <form onSubmit={form.handleSubmit(onSubmit)} noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='add-employee-form'>
                         <div className='grid gap-4 py-4'>
                             <FormField
                                 control={form.control}
