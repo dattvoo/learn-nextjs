@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label'
 import { UpdateEmployeeAccountBody, UpdateEmployeeAccountBodyType } from '@/schemaValidations/account.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Upload } from 'lucide-react'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -30,6 +30,7 @@ export default function EditEmployee({
 }) {
     const [file, setFile] = useState<File | null>(null)
     const avatarInputRef = useRef<HTMLInputElement | null>(null)
+
     const form = useForm<UpdateEmployeeAccountBodyType>({
         resolver: zodResolver(UpdateEmployeeAccountBody),
         defaultValues: {
@@ -39,6 +40,7 @@ export default function EditEmployee({
             password: undefined,
             confirmPassword: undefined,
             changePassword: false,
+
         }
     })
     const avatar = form.watch('avatar')
@@ -50,6 +52,8 @@ export default function EditEmployee({
         }
         return avatar
     }, [file, avatar])
+
+
 
     return (
         <Dialog

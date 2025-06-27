@@ -23,6 +23,7 @@ import { useSearchParams } from 'next/navigation'
 import AutoPagination from '@/components/auto-pagination'
 import AlertDialogDeleteAccount from '@/components/ui/alert-dialog-delete-account'
 import { AccountTableContext, columns } from './columns'
+import { useGetAccountList } from '@/queries/useAccount'
 
 export type AccountItem = AccountListResType['data'][0]
 
@@ -39,7 +40,8 @@ export default function AccountTable() {
     const [employeeIdEdit, setEmployeeIdEdit] = useState<number | undefined>()
     const [employeeDelete, setEmployeeDelete] = useState<AccountItem | null>(null)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const data: any[] = []
+    const accountList = useGetAccountList()
+    const data = accountList.data?.payload.data ?? []
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -100,8 +102,9 @@ export default function AccountTable() {
                 <div className='rounded-md border'>
                     <Table>
                         <TableHeader>
-                            {table.getHeaderGroups().map((headerGroup) => (
-                                <TableRow key={headerGroup.id}>
+                            {table.getHeaderGroups().map((headerGroup) => {
+                                console.log("HEADER group", headerGroup);
+                                return (<TableRow key={headerGroup.id}>
                                     {headerGroup.headers.map((header) => {
                                         return (
                                             <TableHead key={header.id}>
@@ -109,8 +112,9 @@ export default function AccountTable() {
                                             </TableHead>
                                         )
                                     })}
-                                </TableRow>
-                            ))}
+                                </TableRow>)
+                            }
+                            )}
                         </TableHeader>
                         <TableBody>
                             {table.getRowModel().rows?.length ? (
