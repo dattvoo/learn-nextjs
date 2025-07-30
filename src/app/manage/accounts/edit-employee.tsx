@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import { Button } from '@/components/ui/button'
 import {
@@ -18,6 +19,11 @@ import { useForm } from 'react-hook-form'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Switch } from '@/components/ui/switch'
+import { Role } from '@/constant/type'
+import { useGetAccount, useUpdateAccountMutation } from '@/queries/useAccount'
+import { useMediaMutation } from '@/queries/useMedia'
+import { toast } from 'sonner'
+import { handleErrorApi } from '@/lib/utils'
 
 export default function EditEmployee({
     id,
@@ -29,7 +35,12 @@ export default function EditEmployee({
     onSubmitSuccess?: () => void
 }) {
     const [file, setFile] = useState<File | null>(null)
+
     const avatarInputRef = useRef<HTMLInputElement | null>(null)
+
+    const updateAccountMutation = useUpdateAccountMutation()
+    const useMediaUploadMutation = useMediaMutation()
+
 
     const form = useForm<UpdateEmployeeAccountBodyType>({
         resolver: zodResolver(UpdateEmployeeAccountBody),
@@ -40,18 +51,73 @@ export default function EditEmployee({
             password: undefined,
             confirmPassword: undefined,
             changePassword: false,
-
-        }
+            role: Role.Employee, // 👈 cần thêm dòng này
+        },
     })
     const avatar = form.watch('avatar')
     const name = form.watch('name')
     const changePassword = form.watch('changePassword')
+
+
     const previewAvatarFromFile = useMemo(() => {
         if (file) {
             return URL.createObjectURL(file)
         }
         return avatar
     }, [file, avatar])
+
+    const { data } = useGetAccount({ id: id as number })
+
+    useEffect(() => {
+        if (data) {
+            const { name, avatar, email, role } = data.payload.data
+            form.reset({
+                name,
+                avatar: avatar ?? undefined,
+                email,
+                changePassword: form.getValues('changePassword'),
+                password: form.getValues('password'),
+                role
+            })
+        }
+    }, [data, form])
+
+    const onReset = () => {
+        form.reset();
+        setFile(null)
+    }
+
+
+    console.log('Error when submit', form.getValues('name'));
+
+    const onSubmit = async (values: UpdateEmployeeAccountBodyType) => {
+        console.log('Inhere?');
+        if (updateAccountMutation.isPending) return
+        try {
+            let body: UpdateEmployeeAccountBodyType & { id: number } = { id: id as number, ...values }
+
+            // O day se chia 2 truong hop upLoad anh, Neu nhu co chon file anh thi se upload anh truoc => tra ve URL roi ta moi lay URL de gan vao`
+            if (file) {
+                const formData = new FormData();
+                formData.append('file', file)
+                const uploadImageResult = await useMediaUploadMutation.mutateAsync(formData)
+                const urlImageResult = uploadImageResult.payload.data
+                body = {
+                    ...body,
+                    avatar: urlImageResult
+                }
+                // dang hoc toi 23:41
+                // edit user
+            }
+            console.log('body', body);
+            const result = await updateAccountMutation.mutateAsync(body);
+            toast(result.payload.message)
+            setId(undefined)
+            onReset()
+        } catch (error: any) {
+            handleErrorApi(error)
+        }
+    }
 
 
 
@@ -69,8 +135,8 @@ export default function EditEmployee({
                     <DialogTitle>Cập nhật tài khoản</DialogTitle>
                     <DialogDescription>Các trường tên, email, mật khẩu là bắt buộc</DialogDescription>
                 </DialogHeader>
-                <Form {...form}>
-                    <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='edit-employee-form'>
+                <Form {...form} >
+                    <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='edit-employee-form' onSubmit={form.handleSubmit(onSubmit)}>
                         <div className='grid gap-4 py-4'>
                             <FormField
                                 control={form.control}
