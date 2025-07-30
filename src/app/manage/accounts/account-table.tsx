@@ -86,7 +86,9 @@ export default function AccountTable() {
     return (
         <AccountTableContext.Provider value={{ employeeIdEdit, setEmployeeIdEdit, employeeDelete, setEmployeeDelete }}>
             <div className='w-full'>
-                <EditEmployee id={employeeIdEdit} setId={setEmployeeIdEdit} onSubmitSuccess={() => { }} />
+                <EditEmployee id={employeeIdEdit} setId={setEmployeeIdEdit} onSubmitSuccess={() => {
+                    console.log('submited');
+                }} />
                 <AlertDialogDeleteAccount employeeDelete={employeeDelete} setEmployeeDelete={setEmployeeDelete} />
                 <div className='flex items-center py-4'>
                     <Input
@@ -103,7 +105,6 @@ export default function AccountTable() {
                     <Table>
                         <TableHeader>
                             {table.getHeaderGroups().map((headerGroup) => {
-                                console.log("HEADER group", headerGroup);
                                 return (<TableRow key={headerGroup.id}>
                                     {headerGroup.headers.map((header) => {
                                         return (

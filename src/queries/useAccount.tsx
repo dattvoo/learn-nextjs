@@ -43,7 +43,8 @@ export const useGetAccountList = () => {
 export const useGetAccount = ({ id }: { id: number }) => {
     return useQuery({
         queryKey: ['account', id],
-        queryFn: () => accountAPIRequest.getEmployee(id)
+        queryFn: () => accountAPIRequest.getEmployee(id),
+        enabled: Boolean(id)
     })
 }
 export const useAddAccountMutation = () => {
