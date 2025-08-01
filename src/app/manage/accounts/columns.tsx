@@ -21,6 +21,8 @@ export const AccountTableContext = createContext<{
 })
 
 
+
+
 export const columns: ColumnDef<AccountType>[] = [
     {
         accessorKey: 'id',
@@ -66,6 +68,7 @@ export const columns: ColumnDef<AccountType>[] = [
 
             const openDeleteEmployee = () => {
                 setEmployeeDelete(row.original)
+
             }
             return (
                 <DropdownMenu modal={false}>
