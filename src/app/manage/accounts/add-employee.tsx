@@ -78,6 +78,7 @@ export default function AddEmployee() {
             toast(result.payload.message)
             setOpen(false)
             onReset()
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             handleErrorApi(error)
         }

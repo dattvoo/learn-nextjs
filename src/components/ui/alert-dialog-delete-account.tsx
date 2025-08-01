@@ -9,6 +9,9 @@ import {
     AlertDialogHeader,
     AlertDialogTitle
 } from "./alert-dialog"
+import { useDeleteAccountMutation } from "@/queries/useAccount"
+import { toast } from "sonner"
+import { handleErrorApi } from "@/lib/utils"
 
 
 
@@ -20,6 +23,22 @@ function AlertDialogDeleteAccount({
     employeeDelete: AccountItem | null
     setEmployeeDelete: (value: AccountItem | null) => void
 }) {
+
+    console.log('Employee Delete: ', employeeDelete);
+    const { mutateAsync: mutateAsyncDeleteAccount } = useDeleteAccountMutation()
+
+    const deleteAccount = async () => {
+        if (employeeDelete) {
+            try {
+                const result = await mutateAsyncDeleteAccount(employeeDelete.id)
+                setEmployeeDelete(null)
+                toast(result.payload.message)
+            } catch (error: any) {
+                handleErrorApi(error)
+            }
+        }
+    }
+
     return (
         <AlertDialog
             open={Boolean(employeeDelete)}
@@ -39,7 +58,7 @@ function AlertDialogDeleteAccount({
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction>Continue</AlertDialogAction>
+                    <AlertDialogAction onClick={deleteAccount}>Continue</AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
