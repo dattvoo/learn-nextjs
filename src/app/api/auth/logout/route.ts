@@ -31,9 +31,7 @@ export async function POST(request: Request) {
       refreshToken,
     });
 
-    // Nextjs server truyen thang data ve client component
     return Response.json(result.payload);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     console.log("error", error);
     return Response.json(

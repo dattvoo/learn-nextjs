@@ -39,7 +39,6 @@ export default function AccountTable() {
     // const params = Object.fromEntries(searchParam.entries())
     const [employeeIdEdit, setEmployeeIdEdit] = useState<number | undefined>()
     const [employeeDelete, setEmployeeDelete] = useState<AccountItem | null>(null)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const accountList = useGetAccountList()
     const data = accountList.data?.payload.data ?? []
     const [sorting, setSorting] = useState<SortingState>([])
