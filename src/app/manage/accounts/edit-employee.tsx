@@ -91,7 +91,6 @@ export default function EditEmployee({
     console.log('Error when submit', form.getValues('name'));
 
     const onSubmit = async (values: UpdateEmployeeAccountBodyType) => {
-        console.log('Inhere?');
         if (updateAccountMutation.isPending) return
         try {
             let body: UpdateEmployeeAccountBodyType & { id: number } = { id: id as number, ...values }
@@ -106,10 +105,7 @@ export default function EditEmployee({
                     ...body,
                     avatar: urlImageResult
                 }
-                // dang hoc toi 23:41
-                // edit user
             }
-            console.log('body', body);
             const result = await updateAccountMutation.mutateAsync(body);
             toast(result.payload.message)
             setId(undefined)
