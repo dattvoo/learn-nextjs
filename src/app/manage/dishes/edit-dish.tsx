@@ -12,15 +12,18 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Upload } from 'lucide-react'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { getVietnameseDishStatus } from '@/lib/utils'
+import { getVietnameseDishStatus, handleErrorApi } from '@/lib/utils'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { UpdateDishBody, UpdateDishBodyType } from '@/schemaValidations/dish.schema'
 import { DishStatus, DishStatusValues } from '@/constants/type'
 import { Textarea } from '@/components/ui/textarea'
+import { useGetDetailDishes, useUpdateDishesMutation } from '@/queries/useDishes'
+import { useMediaMutation } from '@/queries/useMedia'
+import { toast } from 'sonner'
 
 export default function EditDish({
     id,
@@ -51,22 +54,75 @@ export default function EditDish({
         }
         return image
     }, [file, image])
+
+    const { data } = useGetDetailDishes(id as number)
+    const updateDishesMutation = useUpdateDishesMutation()
+    const useMediaUploadMutation = useMediaMutation()
+    // Get detail
+    useEffect(() => {
+        if (data) {
+            const values = data?.payload.data
+            form.reset({
+                name: values?.name,
+                description: values?.description,
+                price: values?.price,
+                status: values?.status,
+                image: values.image ?? undefined
+            })
+        }
+    }, [data, form])
+
+    const onReset = () => {
+        form.reset()
+    }
+
+    const onSubmit = async (values: UpdateDishBodyType) => {
+        let body: UpdateDishBodyType & { id: number } = { id: id as number, ...values }
+        if (updateDishesMutation.isPending) return
+        try {
+            if (file) {
+                const formData = new FormData()
+                formData.append('file', file)
+                const uploadImageResult = await useMediaUploadMutation.mutateAsync(formData)
+                const urlImageResult = uploadImageResult.payload.data
+                body = {
+                    ...body,
+                    image: urlImageResult
+                }
+            }
+            const result = await updateDishesMutation.mutateAsync(body)
+            toast(result.payload.message)
+            setId(undefined)
+            onReset()
+        } catch (error: any) {
+            handleErrorApi(error)
+        }
+    }
+
+
+
     return (
         <Dialog
             open={Boolean(id)}
             onOpenChange={(value) => {
                 if (!value) {
                     setId(undefined)
+
                 }
             }}
+
         >
-            <DialogContent className='sm:max-w-[600px] max-h-screen overflow-auto'>
+            <DialogContent className='sm:max-w-[600px] max-h-screen overflow-auto'
+                onInteractOutside={onReset}
+            >
                 <DialogHeader>
                     <DialogTitle>Cập nhật món ăn</DialogTitle>
                     <DialogDescription>Các trường sau đây là bắ buộc: Tên, ảnh</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
-                    <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='edit-dish-form'>
+                    <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='edit-dish-form'
+                        onSubmit={form.handleSubmit(onSubmit)}
+                    >
                         <div className='grid gap-4 py-4'>
                             <FormField
                                 control={form.control}

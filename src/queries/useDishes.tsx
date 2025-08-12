@@ -30,7 +30,7 @@ export const useAddDishesMutation = () => {
     })
 }
 
-export const useUpdateAccountMutation = () => {
+export const useUpdateDishesMutation = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: ({ id, ...body }: UpdateDishBodyType & { id: number }) => dishesAPIRequest.updateDish(id, body),
