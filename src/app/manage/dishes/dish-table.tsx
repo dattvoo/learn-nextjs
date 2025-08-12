@@ -37,13 +37,14 @@ import {
     AlertDialogHeader,
     AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import { formatCurrency, getVietnameseDishStatus } from '@/lib/utils'
+import { formatCurrency, getVietnameseDishStatus, handleErrorApi } from '@/lib/utils'
 import { useSearchParams } from 'next/navigation'
 import AutoPagination from '@/components/auto-pagination'
 import { DishListResType } from '@/schemaValidations/dish.schema'
 import EditDish from '@/app/manage/dishes/edit-dish'
 import AddDish from '@/app/manage/dishes/add-dish'
-import { useGetDishesList } from '@/queries/useDishes'
+import { useDeleteDishesMutation, useGetDishesList } from '@/queries/useDishes'
+import { toast } from 'sonner'
 
 type DishItem = DishListResType['data'][0]
 
@@ -137,6 +138,21 @@ function AlertDialogDeleteDish({
     dishDelete: DishItem | null
     setDishDelete: (value: DishItem | null) => void
 }) {
+    const mutationDeleteDishes = useDeleteDishesMutation()
+
+    const deleteDishes = async () => {
+        if (dishDelete) {
+            try {
+                const result = await mutationDeleteDishes.mutateAsync(dishDelete.id)
+                setDishDelete(null)
+                toast(result.payload.message)
+            } catch (error: any) {
+                handleErrorApi(error)
+            }
+        }
+    }
+
+
     return (
         <AlertDialog
             open={Boolean(dishDelete)}
@@ -156,7 +172,7 @@ function AlertDialogDeleteDish({
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction>Continue</AlertDialogAction>
+                    <AlertDialogAction onClick={deleteDishes}>Continue</AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
