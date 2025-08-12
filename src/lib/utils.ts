@@ -3,7 +3,8 @@ import { UseFormSetError } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 import { EntityError } from "./http";
 import { toast } from "sonner";
-import { DishStatus } from "@/constant/type";
+import { DishStatus, TableStatus } from "@/constant/type";
+import envConfig from "@/config";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -88,4 +89,29 @@ export const getVietnameseDishStatus = (
     default:
       return "Ẩn";
   }
+};
+
+export const getVietnameseTableStatus = (
+  status: (typeof TableStatus)[keyof typeof TableStatus]
+) => {
+  switch (status) {
+    case TableStatus.Available:
+      return "Có sẵn";
+    case TableStatus.Reserved:
+      return "Đã đặt";
+    default:
+      return "Ẩn";
+  }
+};
+
+export const getTableLink = ({
+  token,
+  tableNumber,
+}: {
+  token: string;
+  tableNumber: number;
+}) => {
+  return (
+    envConfig.NEXT_PUBLIC_URL + "/tables/" + tableNumber + "?token=" + token
+  );
 };
