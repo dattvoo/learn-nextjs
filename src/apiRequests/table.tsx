@@ -1,7 +1,7 @@
 import http from "@/lib/http"
 import { CreateTableBodyType, TableListResType, TableResType, UpdateTableBodyType } from "@/schemaValidations/table.schema"
 
-const prefix = '/table'
+const prefix = '/tables'
 
 export const tableAPIRequest = {
     getTableList: () => {
