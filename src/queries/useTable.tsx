@@ -13,7 +13,8 @@ export const useGetListTable = () => {
 export const useGetDetailTable = (id: number) => {
     return useQuery({
         queryKey: ['table', id],
-        queryFn: () => tableAPIRequest.getDetailTable(id)
+        queryFn: () => tableAPIRequest.getDetailTable(id),
+        enabled: Boolean(id)
     })
 }
 
