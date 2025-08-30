@@ -13,7 +13,7 @@ export const tableAPIRequest = {
     },
 
     addTable: (body: CreateTableBodyType) => {
-        return http.post<CreateTableBodyType>(`${prefix}`, body)
+        return http.post<TableResType>(`${prefix}`, body)
     },
 
     updateTable: (id: number, body: UpdateTableBodyType) => {
