@@ -36,14 +36,15 @@ import {
     AlertDialogHeader,
     AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import { getTableLink, getVietnameseTableStatus } from '@/lib/utils'
+import { getTableLink, getVietnameseTableStatus, handleErrorApi } from '@/lib/utils'
 import { useSearchParams } from 'next/navigation'
 import AutoPagination from '@/components/auto-pagination'
 import { TableListResType } from '@/schemaValidations/table.schema'
 import EditTable from '@/app/manage/tables/edit-table'
 import AddTable from '@/app/manage/tables/add-table'
-import { useGetListTable } from '@/queries/useTable'
+import { useDeleteTableMutaion, useGetListTable } from '@/queries/useTable'
 import QRcodeTable from '@/components/qrcode-table'
+import { toast } from 'sonner'
 
 type TableItem = TableListResType['data'][0]
 
@@ -124,6 +125,21 @@ function AlertDialogDeleteTable({
     tableDelete: TableItem | null
     setTableDelete: (value: TableItem | null) => void
 }) {
+
+    const deleteTable = useDeleteTableMutaion()
+
+    const onDeleteTable = async () => {
+        if (deleteTable.isPending) return
+        try {
+            if (tableDelete) {
+                const result = await deleteTable.mutateAsync(tableDelete?.number)
+                toast(result.payload.message)
+            }
+        } catch (error: any) {
+            handleErrorApi(error)
+        }
+
+    }
     return (
         <AlertDialog
             open={Boolean(tableDelete)}
@@ -143,7 +159,7 @@ function AlertDialogDeleteTable({
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction>Continue</AlertDialogAction>
+                    <AlertDialogAction onClick={onDeleteTable}>Continue</AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
@@ -199,6 +215,9 @@ export default function TableTable() {
             pageSize: PAGE_SIZE
         })
     }, [table, pageIndex])
+
+
+
 
     return (
         <TableTableContext.Provider value={{ tableIdEdit, setTableIdEdit, tableDelete, setTableDelete }}>

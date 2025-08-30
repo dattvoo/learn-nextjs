@@ -48,9 +48,9 @@ export default function EditTable({
             setTableNumber(result.number)
         }
     }, [data, form])
-    console.log('change token value:', form.getValues('changeToken'))
     const onSubmit = async (values: UpdateTableBodyType) => {
         try {
+            if (updateTableMutation.isPending) return
             const body: UpdateTableBodyType & { id: number } = { id: id as number, ...values }
             const result = await updateTableMutation.mutateAsync(body)
             toast(result.payload.message)
