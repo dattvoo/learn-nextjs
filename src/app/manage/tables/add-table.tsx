@@ -30,6 +30,7 @@ export default function AddTable() {
         form.reset()
     }
     const onSubmit = async (values: CreateTableBodyType) => {
+        if (addTable.isPending) return
         try {
             const result = await addTable.mutateAsync(values);
             if (result) {
