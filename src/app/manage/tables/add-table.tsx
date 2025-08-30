@@ -8,10 +8,12 @@ import { PlusCircle } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
-import { getVietnameseTableStatus } from '@/lib/utils'
+import { getVietnameseTableStatus, handleErrorApi } from '@/lib/utils'
 import { CreateTableBody, CreateTableBodyType } from '@/schemaValidations/table.schema'
 import { TableStatus, TableStatusValues } from '@/constants/type'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useAddTableMutation } from '@/queries/useTable'
+import { toast } from 'sonner'
 
 export default function AddTable() {
     const [open, setOpen] = useState(false)
@@ -23,6 +25,24 @@ export default function AddTable() {
             status: TableStatus.Hidden
         }
     })
+    const addTable = useAddTableMutation();
+    const onReset = () => {
+        form.reset()
+    }
+    const onSubmit = async (values: CreateTableBodyType) => {
+        try {
+            const result = await addTable.mutateAsync(values);
+            if (result) {
+                toast(result.payload.message)
+                setOpen(false)
+                onReset()
+            }
+        } catch (error: any) {
+            handleErrorApi(error)
+        }
+    }
+
+
     return (
         <Dialog onOpenChange={setOpen} open={open}>
             <DialogTrigger asChild>
@@ -36,7 +56,9 @@ export default function AddTable() {
                     <DialogTitle>Thêm bàn</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
-                    <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='add-table-form'>
+                    <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='add-table-form'
+                        onSubmit={form.handleSubmit(onSubmit)}
+                    >
                         <div className='grid gap-4 py-4'>
                             <FormField
                                 control={form.control}
