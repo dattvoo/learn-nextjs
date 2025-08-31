@@ -46,7 +46,7 @@ import AddDish from '@/app/manage/dishes/add-dish'
 import { useDeleteDishesMutation, useGetDishesList } from '@/queries/useDishes'
 import { toast } from 'sonner'
 
-type DishItem = DishListResType['data'][0]
+type DishItem = DishListResType['data'][]
 
 const DishTableContext = createContext<{
     setDishIdEdit: (value: number) => void
