@@ -1,5 +1,5 @@
 import dishesAPIRequest from '@/apiRequests/dishes'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, handleErrorApi } from '@/lib/utils'
 import { DishListResType } from '@/schemaValidations/dish.schema'
 import Image from 'next/image'
 
@@ -12,7 +12,7 @@ export default async function Home() {
     const { payload: { data } } = result
     dishList = data
   } catch (error) {
-
+    handleErrorApi(error)
   }
 
   return (
