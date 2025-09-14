@@ -32,8 +32,7 @@ export async function POST(request: Request) {
     });
 
     return Response.json(result.payload);
-  } catch (error) {
-    console.log("error", error);
+  } catch (error: any) {
     return Response.json(
       {
         message: "Co loi khi goi den server",
