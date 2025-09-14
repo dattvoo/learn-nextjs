@@ -11,7 +11,7 @@ export default async function Home() {
     const result = await dishesAPIRequest.getDishesList()
     const { payload: { data } } = result
     dishList = data
-  } catch (error) {
+  } catch (error: any) {
     handleErrorApi(error)
   }
 
